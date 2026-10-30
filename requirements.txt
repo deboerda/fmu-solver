@@ -1,0 +1,6 @@
+# FMUSolver — Python runtime deps (Windows; dual 32/64 toolchains for workers)
+fmpy>=0.3.20
+protobuf>=4.25
+matplotlib>=3.8
+numpy>=1.26
+pyinstaller>=6.0

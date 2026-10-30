@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Example only — replace codes/desc with your own telemetry map. -->
+<Root>
+  <Param parId="T0001" code="T0001" desc="example_temperature"/>
+  <Param parId="P0001" code="P0001" desc="example_pressure"/>
+  <Param parId="S0001" code="S0001" desc="example_status"/>
+</Root>

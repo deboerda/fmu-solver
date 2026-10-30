@@ -1,0 +1,38 @@
+# FMU models & extracts
+*.fmu
+__extracted_*.fmu__/
+
+# Build / packaging
+build/
+dist/
+Script/build/
+Script/build32/
+Script/dist/
+Script/dist32/
+*.exe
+*.dll
+*.pdb
+FmuSolver_Package/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS / IDE
+Thumbs.db
+.DS_Store
+.vs/
+.vscode/
+*.suo
+
+# Logs & local results
+*.log
+*.tmp
+*.temp
+Script/orbit_pre_result.json
+
+# Field / private configs (keep examples only)
+**/DTS.TM.*.xml
+config/

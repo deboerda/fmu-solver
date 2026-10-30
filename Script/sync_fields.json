@@ -1,0 +1,8 @@
+[
+  {"name": "Year", "source": "Year", "type": "Real", "desc": "initial year", "sync": true},
+  {"name": "Mon", "source": "Mon", "type": "Real", "desc": "initial month", "sync": true},
+  {"name": "Day", "source": "Day", "type": "Real", "desc": "initial day", "sync": true},
+  {"name": "Hour", "source": "Hour", "type": "Real", "desc": "initial hour", "sync": true},
+  {"name": "Min", "source": "Min", "type": "Real", "desc": "initial minute", "sync": true},
+  {"name": "Sec", "source": "Sec", "type": "Real", "desc": "initial second", "sync": true}
+]
