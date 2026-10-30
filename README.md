@@ -28,7 +28,7 @@
 
 Simulation / digital-twin engineers who need a **Windows FMI 2.0 runner** with dual bitness and optional telemetry glue — not locked to a single proprietary model.
 
-## Quick start
+## Quick start (Windows, from source)
 
 ```powershell
 git clone https://github.com/deboerda/fmu-solver.git
@@ -38,11 +38,14 @@ cd Script
 python FmuLauncherUniversal.py
 ```
 
-1. Put your FMI 2.0 `.fmu` in a local `FMU/` folder (or browse in the GUI).  
+1. Put your FMI 2.0 `.fmu` in a local `FMU/` folder (or browse in the GUI). **No `.fmu` is bundled.**  
 2. Optionally copy examples from `Script/examples/` into `ParamFilter.xml` / `sync_fields.json`.  
-3. Start / pause / stop from the GUI; workers spawn by bitness.
+3. Start / pause / stop from the GUI; in source mode the launcher spawns `fmu_player.py` (64-bit = same Python; 32-bit needs `C:\Py32\python.exe`).  
+4. To build one-file exes: `Script\rebuild_all.bat` (see [`docs/FROM_SOURCE.md`](docs/FROM_SOURCE.md)).
 
-More: [`Script/README_Scripts.md`](Script/README_Scripts.md) · [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+**Not a Linux GUI app** — Windows APIs in the launcher. FMPy worker code may import elsewhere, but Win32/Win64 FMU binaries need Windows.
+
+More: [`docs/FROM_SOURCE.md`](docs/FROM_SOURCE.md) · [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`Script/README_Scripts.md`](Script/README_Scripts.md)
 
 ## Architecture
 
@@ -62,16 +65,18 @@ FmuSolver GUI (64-bit)     ← Script/FmuLauncherUniversal.py
 Script/                 # Source of truth (launcher, workers, tools, specs)
 Script/examples/        # Example configs — no .fmu bundled
 Script/yaocetest/       # Optional telemetry bridge sources
-docs/ARCHITECTURE.md    # Sidecar & rebuild notes
+docs/ARCHITECTURE.md    # Sidecar notes
+docs/FROM_SOURCE.md     # Run / package from source (honest limits)
 ddm.proto               # Protobuf schema
 ```
 
 ## Requirements
 
-- Windows 10/11  
-- Python 3.x (64-bit; optional 32-bit toolchain to rebuild 32-bit workers)  
-- An FMI 2.0 `.fmu` you are allowed to run  
-- See `requirements.txt`
+- **Windows 10/11** (GUI / packaging)  
+- Python 3.x **64-bit** + packages in `requirements.txt` (**includes PySide6**)  
+- Optional **32-bit** Python (default `C:\Py32`) for 32-bit FMUs / workers  
+- An FMI 2.0 Co-Simulation `.fmu` you are allowed to run  
+- Packaging: PyInstaller via `Script/rebuild_all.bat` (outputs go next to each other under `dist_package\`)
 
 ## Roadmap
 
