@@ -109,7 +109,7 @@ Browse to `examples\fmus\BouncingBall.fmu`, stop ≈ 3 s, step ≈ 0.01, Start.
 
 Workflow draft: [`docs/ci/windows-build.yml`](ci/windows-build.yml) — builds `FmuSolver.exe` + `FmuWorker64.exe` on `windows-latest` (**no customer/vendor DLLs**).
 
-Enable once (needs a GitHub token/app with the **`workflow`** scope, or paste via the GitHub UI):
+Workflow file is on `main` at `.github/workflows/windows-build.yml` (draft copy also under `docs/ci/`). If you need to re-install:
 
 ```powershell
 mkdir -p .github/workflows
@@ -121,5 +121,6 @@ git push
 
 Then: **Actions → Windows build → Run workflow**, or push a tag `v*`. Download artifact **FMUSolver-win64** (or Release assets on tags). Put `FmuWorker64.exe` next to `FmuSolver.exe`.
 
-Local alternative: `Scriptebuild_all.bat`.
+Local alternative: `Script
+ebuild_all.bat`.
 
