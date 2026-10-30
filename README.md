@@ -1,8 +1,8 @@
-# FMUSolver
+# FMUSolver: FMI 2.0 Co-Simulation Runner
 
-**Open FMI 2.0 co-simulation runner for Windows** — load a rights-cleared `.fmu`, auto-pick a 32- or 64-bit sidecar worker, drive real-time steps from a PySide GUI, and optionally map live telemetry into model inputs or stream variables over **UDP + Protobuf**.
+Windows host for **FMI 2.0** Functional Mock-up Units: load a rights-cleared `.fmu`, select a matching **32- or 64-bit sidecar worker**, run real-time co-simulation from a PySide GUI, and optionally map telemetry into model inputs or publish variables over **UDP + Protobuf**.
 
-Repo: [`deboerda/fmu-solver`](https://github.com/deboerda/fmu-solver) · Product: **FMUSolver** · License: **MIT** · Latest: [**v0.1.0**](https://github.com/deboerda/fmu-solver/releases/tag/v0.1.0)
+[`deboerda/fmu-solver`](https://github.com/deboerda/fmu-solver) · Product **FMUSolver** · **MIT** · [**v0.1.0**](https://github.com/deboerda/fmu-solver/releases/tag/v0.1.0)
 
 [![Python](https://img.shields.io/badge/Python-3.x-3776AB?logo=python)](#requirements)
 [![FMI](https://img.shields.io/badge/FMI-2.0%20FMU-orange)](#what-it-does)
@@ -26,7 +26,7 @@ Most FMI tooling either stays in Modelica IDEs or assumes one bitness and one ve
 | **FMI 2.0 core** | Load, `doStep`, pause/resume/stop, live parameter inject |
 | **Telemetry bridge** | Config-driven parse → map → FMU inputs (optional) |
 | **UDP + Protobuf** | Fan-out selected variables to viz / peers (`ddm.proto`) |
-| **Ship it** | PyInstaller specs, `rebuild_all.bat`, CI win64 artifacts |
+| **Packaging / CI** | PyInstaller specs, `rebuild_all.bat`, win64 Release artifacts |
 
 Built for simulation and digital-twin engineers who need a **portable FMI 2.0 runner**, not a locked proprietary model package.
 
