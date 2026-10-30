@@ -2,15 +2,15 @@
 
 Windows host for **FMI 2.0** Functional Mock-up Units: load a rights-cleared `.fmu`, select a matching **32- or 64-bit sidecar worker**, run real-time co-simulation from a PySide GUI, and optionally map telemetry into model inputs or publish variables over **UDP + Protobuf**.
 
-[`deboerda/fmu-solver`](https://github.com/deboerda/fmu-solver) · Product **FMUSolver** · **MIT** · [**v0.1.0**](https://github.com/deboerda/fmu-solver/releases/tag/v0.1.0)
+[`deboerda/fmu-solver`](https://github.com/deboerda/fmu-solver) · Product **FMUSolver** · **MIT** · [**v0.1.1**](https://github.com/deboerda/fmu-solver/releases/tag/v0.1.1)
 
 [![Python](https://img.shields.io/badge/Python-3.x-3776AB?logo=python)](#requirements)
 [![FMI](https://img.shields.io/badge/FMI-2.0%20FMU-orange)](#what-it-does)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/deboerda/fmu-solver?include_prereleases)](https://github.com/deboerda/fmu-solver/releases/tag/v0.1.0)
+[![Release](https://img.shields.io/github/v/release/deboerda/fmu-solver?include_prereleases)](https://github.com/deboerda/fmu-solver/releases/tag/v0.1.1)
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-0078D4?logo=windows)](#requirements)
 
-Public source edition: no customer models or vendor solver DLLs. Clone-and-run demo: [Reference-FMUs **BouncingBall**](Script/examples/fmus/BouncingBall.fmu) (BSD-2). Prebuilt win64 GUI + worker on [Releases](https://github.com/deboerda/fmu-solver/releases).
+Public source edition: no customer models or vendor solver DLLs. Clone-and-run demo: [Reference-FMUs **BouncingBall**](Script/examples/fmus/BouncingBall.fmu) (BSD-2). Prebuilt win64: download **`FMUSolver-win64.zip`** from [Releases](https://github.com/deboerda/fmu-solver/releases) (both exes must stay in one folder).
 
 > Split from a private field archive (`fmu-cosim-runner`); this repo keeps the reusable runner only.
 
@@ -56,7 +56,15 @@ python -m pip install -r ..\requirements.txt
 ```
 
 GUI: `run_fmusolver_dev.bat` → open that `.fmu` → stop ≈ 3 s.  
-Prebuilt win64 GUI/worker: GitHub Actions workflow `Windows build` (artifact / Release on tags `v*`) — see [`docs/FROM_SOURCE.md`](docs/FROM_SOURCE.md).
+### Prebuilt download (Windows)
+
+1. Open [**Releases → v0.1.1**](https://github.com/deboerda/fmu-solver/releases/tag/v0.1.1).
+2. Download **`FMUSolver-win64.zip`** (recommended single package).
+3. Extract so `FmuSolver.exe` and `FmuWorker64.exe` stay in the **same folder**, then run `FmuSolver.exe`.
+4. Sample FMU is inside the zip at `examples\fmus\BouncingBall.fmu`.
+
+Loose exe assets on the Release page are optional; do **not** download only `FmuSolver.exe`.  
+CI: workflow `Windows build` — see [`docs/FROM_SOURCE.md`](docs/FROM_SOURCE.md).
 
 **Not a Linux GUI app** — Windows APIs in the launcher. FMPy worker code may import elsewhere, but Win32/Win64 FMU binaries need Windows.
 
