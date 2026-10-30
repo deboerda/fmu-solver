@@ -1,32 +1,34 @@
-# FMUSolver — FMI 2.0 Co-Simulation Runner
+# FMUSolver
 
-> **Product:** FMUSolver · **Public repo:** [`deboerda/fmu-solver`](https://github.com/deboerda/fmu-solver)  
-> Load **FMI 2.0 FMUs**, run real-time co-simulation, optionally bridge telemetry into model inputs, and stream selected variables over **UDP + Protobuf**.
+**Open FMI 2.0 co-simulation runner for Windows** — load a rights-cleared `.fmu`, auto-pick a 32- or 64-bit sidecar worker, drive real-time steps from a PySide GUI, and optionally map live telemetry into model inputs or stream variables over **UDP + Protobuf**.
+
+Repo: [`deboerda/fmu-solver`](https://github.com/deboerda/fmu-solver) · Product: **FMUSolver** · License: **MIT** · Latest: [**v0.1.0**](https://github.com/deboerda/fmu-solver/releases/tag/v0.1.0)
 
 [![Python](https://img.shields.io/badge/Python-3.x-3776AB?logo=python)](#requirements)
 [![FMI](https://img.shields.io/badge/FMI-2.0%20FMU-orange)](#what-it-does)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/deboerda/fmu-solver?include_prereleases)](https://github.com/deboerda/fmu-solver/releases/tag/v0.1.0)
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-0078D4?logo=windows)](#requirements)
 
-**Source-only public edition** — no field binaries, no customer models. Bring your own rights-cleared `.fmu` (see [`Script/examples/`](Script/examples/)).
+Public source edition: no customer models or vendor solver DLLs. Clone-and-run demo: [Reference-FMUs **BouncingBall**](Script/examples/fmus/BouncingBall.fmu) (BSD-2). Prebuilt win64 GUI + worker on [Releases](https://github.com/deboerda/fmu-solver/releases).
 
-> Earlier monolith with packaged deploy artifacts lived at `fmu-cosim-runner` (now private archive).
+> Split from a private field archive (`fmu-cosim-runner`); this repo keeps the reusable runner only.
 
-## Project highlights（项目亮点）
+## Why this exists
 
-| Highlight | Detail |
-|-----------|--------|
-| **Sidecar multi-arch** | Detect FMU bitness → spawn 32- or 64-bit worker |
-| **FMI 2.0 core** | Load, step, pause/resume/stop, hot parameter inject |
-| **Optional telemetry bridge** | Parse → map → FMU inputs (config-driven examples) |
-| **UDP + Protobuf fan-out** | Stream variables to viz / peers (`ddm.proto`) |
-| **Rebuild scripts** | PyInstaller specs + `rebuild_all.bat` |
+Most FMI tooling either stays in Modelica IDEs or assumes one bitness and one vendor stack. FMUSolver is a thin Windows host: **detect bitness → spawn the matching worker → step / pause / inject → optional I/O bridges**. Handy for digital-twin benches, HIL-style loops, and quick FMU smoke tests without dragging a full modeling suite.
 
-**Role:** core developer — sidecar architecture, simulation control, telemetry mapping, packaging tooling.
+## Highlights
 
-## Who it's for
+| | |
+|--|--|
+| **Sidecar 32/64** | FMU bitness detection → matching worker process |
+| **FMI 2.0 core** | Load, `doStep`, pause/resume/stop, live parameter inject |
+| **Telemetry bridge** | Config-driven parse → map → FMU inputs (optional) |
+| **UDP + Protobuf** | Fan-out selected variables to viz / peers (`ddm.proto`) |
+| **Ship it** | PyInstaller specs, `rebuild_all.bat`, CI win64 artifacts |
 
-Simulation / digital-twin engineers who need a **Windows FMI 2.0 runner** with dual bitness and optional telemetry glue — not locked to a single proprietary model.
+Built for simulation and digital-twin engineers who need a **portable FMI 2.0 runner**, not a locked proprietary model package.
 
 ## Quick start (Windows, from source)
 
@@ -38,7 +40,7 @@ cd Script
 python FmuLauncherUniversal.py
 ```
 
-1. Put your FMI 2.0 `.fmu` in a local `FMU/` folder (or browse in the GUI). **No `.fmu` is bundled.**  
+1. Put your FMI 2.0 `.fmu` in a local `FMU/` folder (or browse in the GUI). Demo: [`Script/examples/fmus/BouncingBall.fmu`](Script/examples/fmus/BouncingBall.fmu).  
 2. Optionally copy examples from `Script/examples/` into `ParamFilter.xml` / `sync_fields.json`.  
 3. Start / pause / stop from the GUI; in source mode the launcher spawns `fmu_player.py` (64-bit = same Python; 32-bit needs `C:\Py32\python.exe`).  
 4. To build one-file exes: `Script\rebuild_all.bat` (see [`docs/FROM_SOURCE.md`](docs/FROM_SOURCE.md)).
@@ -76,7 +78,7 @@ FmuSolver GUI (64-bit)     ← Script/FmuLauncherUniversal.py
 
 ```
 Script/                 # Source of truth (launcher, workers, tools, specs)
-Script/examples/        # Example configs — no .fmu bundled
+Script/examples/        # Example configs + BouncingBall.fmu demo
 Script/yaocetest/       # Optional telemetry bridge sources
 docs/ARCHITECTURE.md    # Sidecar notes
 docs/FROM_SOURCE.md     # Run / package from source (honest limits)
