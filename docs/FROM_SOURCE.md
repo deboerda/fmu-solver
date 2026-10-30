@@ -119,8 +119,9 @@ git commit -m "ci: enable Windows PyInstaller workflow"
 git push
 ```
 
-Then: **Actions → Windows build → Run workflow**, or push a tag `v*`. Download artifact **FMUSolver-win64** (or Release assets on tags). Put `FmuWorker64.exe` next to `FmuSolver.exe`.
+Then: **Actions → Windows build → Run workflow**, or push a tag `v*`.
 
-Local alternative: `Script
-ebuild_all.bat`.
+**Recommended download:** Release asset **`FMUSolver-win64.zip`** (GUI + worker + sample FMU + README). Extract and keep `FmuSolver.exe` next to `FmuWorker64.exe`. Loose exe assets are optional. Workflow runs also upload artifact **FMUSolver-win64**.
+
+Local alternative: `Script\rebuild_all.bat`.
 
