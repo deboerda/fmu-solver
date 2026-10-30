@@ -73,12 +73,29 @@ jobs:
           Copy-Item examples\fmus\LICENSE-Reference-FMUs-BSD-2-Clause.txt "$out\examples\fmus\"
           if (Test-Path fmusolver_full.ico) { Copy-Item fmusolver_full.ico $out\ }
           @"
-          FMUSolver win64 build (source tools only — no customer DLLs)
-          1. Run FmuSolver.exe
-          2. Browse to examples\fmus\BouncingBall.fmu
-          3. Stop time ~3 s, step ~0.01, Start
-          Or: FmuWorker64.exe examples\fmus\BouncingBall.fmu --step 0.01 --rate 0 --freq 10 --time 3
-          "@ | Set-Content -Encoding utf8 "$out\README-DEMO.txt"
+          FMUSolver win64 (source tools only — no customer/vendor DLLs)
+
+          IMPORTANT: Keep FmuSolver.exe and FmuWorker64.exe in the SAME folder.
+          Do not run only one exe from Downloads.
+
+          Quick start:
+          1. Unzip this package (or the Release zip) to a folder.
+          2. Double-click FmuSolver.exe
+          3. Browse to examples\fmus\BouncingBall.fmu
+          4. Stop time ~3 s, step ~0.01, Start
+
+          CLI smoke:
+            FmuWorker64.exe examples\fmus\BouncingBall.fmu --step 0.01 --rate 0 --freq 10 --time 3
+
+          If the GUI fails to open, check FmuSolver_crash.log next to the exe.
+          "@ | Set-Content -Encoding utf8 "$out\README.txt"
+
+      - name: Zip release package
+        shell: pwsh
+        working-directory: Script
+        run: |
+          if (Test-Path FMUSolver-win64.zip) { Remove-Item FMUSolver-win64.zip -Force }
+          Compress-Archive -Path "dist_package\*" -DestinationPath "FMUSolver-win64.zip" -Force
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -92,12 +109,29 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
+            Script/FMUSolver-win64.zip
             Script/dist_package/FmuSolver.exe
             Script/dist_package/FmuWorker64.exe
           body: |
-            Prebuilt **win64** GUI + worker from CI (no customer/vendor solver DLLs).
-            Demo FMU is in the repo at `Script/examples/fmus/BouncingBall.fmu` (Reference-FMUs, BSD-2-Clause).
-            Place `FmuWorker64.exe` next to `FmuSolver.exe`, then open the sample FMU in the GUI.
+            ## Download (recommended)
+
+            **Prefer the zip:** [`FMUSolver-win64.zip`](../../releases/download/${{ github.ref_name }}/FMUSolver-win64.zip)
+
+            Contents:
+            - `FmuSolver.exe` (GUI) — **must stay next to** `FmuWorker64.exe`
+            - `FmuWorker64.exe` (FMI worker)
+            - `examples/fmus/BouncingBall.fmu` (Reference-FMUs, BSD-2-Clause)
+            - `README.txt`
+
+            ## Setup
+
+            1. Download **FMUSolver-win64.zip** and extract to a folder (not just one exe from Assets).
+            2. Double-click `FmuSolver.exe`.
+            3. Open `examples\fmus\BouncingBall.fmu`, stop ≈ 3 s, step ≈ 0.01, Start.
+
+            Loose `FmuSolver.exe` / `FmuWorker64.exe` assets remain for advanced use — if you take those, put **both** in the same directory.
+
+            Startup failures write `FmuSolver_crash.log` beside the GUI (windowed build has no console).
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
