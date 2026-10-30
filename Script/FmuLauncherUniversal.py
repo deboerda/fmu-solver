@@ -2620,6 +2620,16 @@ class FmuSolverGUI(QMainWindow):
             cmd = [worker_p]
             if "FmuSolver.exe" in worker_p: cmd.append("--worker")
             cmd.extend([fmu_path] + sim_args)
+            if not os.path.exists(worker_p):
+                QMessageBox.critical(
+                    self,
+                    "缺少 Worker",
+                    f"找不到仿真 Worker:\n{worker_p}\n\n"
+                    "请将 FmuWorker64.exe（或 FmuWorker32.exe）与 FmuSolver.exe 放在同一目录。\n"
+                    "建议下载 Release 中的 FMUSolver-win64.zip 整包解压。",
+                )
+                self._reset_ui()
+                return
         else:
             # 源码模式下使用对应的 Python 环境
             player_script = os.path.join(APP_DIR, "fmu_player.py")
@@ -3351,20 +3361,74 @@ if __name__ == "__main__":
         sys.exit(0)
 
     else:
+        def _fatal_startup(msg, exc=None):
+            """Windowed exe has no console — surface startup failures."""
+            import traceback
+            detail = msg if exc is None else f"{msg}\n\n{exc}\n\n{traceback.format_exc()}"
+            log_path = os.path.join(APP_DIR, "FmuSolver_crash.log")
+            try:
+                with open(log_path, "w", encoding="utf-8") as f:
+                    f.write(f"FmuSolver startup failure ({datetime.now()}):\n{detail}\n")
+            except Exception:
+                log_path = None
+            try:
+                text = detail if len(detail) < 900 else (detail[:900] + "...")
+                if log_path:
+                    text += f"\n\nDetails written to:\n{log_path}"
+                ctypes.windll.user32.MessageBoxW(None, text, "FmuSolver", 0x10)
+            except Exception:
+                pass
+            sys.exit(1)
+
         # 强制单实例运行 (FmuSolver)
         mutex_name = "Local\\FmuSolver_Global_Mutex"
-        import ctypes
         kernel32 = ctypes.windll.kernel32
         mutex = kernel32.CreateMutexW(None, False, mutex_name)
-        if kernel32.GetLastError() == 183: # ERROR_ALREADY_EXISTS
+        if kernel32.GetLastError() == 183:  # ERROR_ALREADY_EXISTS
             hwnd = ctypes.windll.user32.FindWindowW(None, "FmuSolver")
             if hwnd:
-                ctypes.windll.user32.ShowWindow(hwnd, 5) # SW_SHOW
+                ctypes.windll.user32.ShowWindow(hwnd, 5)  # SW_SHOW
                 ctypes.windll.user32.SetForegroundWindow(hwnd)
+                sys.exit(0)
+            # Mutex held but no window (crash leftover / first-run race) — do not silent-exit.
+            try:
+                ctypes.windll.user32.MessageBoxW(
+                    None,
+                    "FmuSolver 似乎已在运行，但找不到窗口。\n"
+                    "请在任务管理器结束残留的 FmuSolver.exe 后再试。\n"
+                    "若没有进程，请等待数秒后再双击（首次解压可能较慢）。",
+                    "FmuSolver",
+                    0x30,
+                )
+            except Exception:
+                pass
             sys.exit(0)
 
-        app = QApplication(sys.argv)
-        window = FmuSolverGUI()
-        window.setWindowTitle("FmuSolver") # 必须设置，以便单实例检测查找
-        window.show()
-        sys.exit(app.exec())
+        # Packaged GUI needs worker sidecar(s) in the same folder.
+        if getattr(sys, "frozen", False):
+            w64 = os.path.join(APP_DIR, "FmuWorker64.exe")
+            w32 = os.path.join(APP_DIR, "FmuWorker32.exe")
+            if not os.path.exists(w64) and not os.path.exists(w32):
+                warn = (
+                    f"未找到 FmuWorker64.exe（须与 FmuSolver.exe 放在同一目录）。\n"
+                    f"请下载 Release 的 zip 整包并解压后再运行。\n"
+                    f"当前目录: {APP_DIR}"
+                )
+                try:
+                    with open(os.path.join(APP_DIR, "FmuSolver_crash.log"), "w", encoding="utf-8") as f:
+                        f.write(f"Missing worker beside GUI ({datetime.now()}).\nExpected: {w64}\n")
+                except Exception:
+                    pass
+                try:
+                    ctypes.windll.user32.MessageBoxW(None, warn, "FmuSolver", 0x30)
+                except Exception:
+                    pass
+
+        try:
+            app = QApplication(sys.argv)
+            window = FmuSolverGUI()
+            window.setWindowTitle("FmuSolver")  # 必须设置，以便单实例检测查找
+            window.show()
+            sys.exit(app.exec())
+        except Exception as e:
+            _fatal_startup("GUI 启动失败", e)
