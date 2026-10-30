@@ -1,0 +1,4 @@
+[
+  {"name": "h", "source": "h", "type": "Real", "desc": "ball height (m)", "sync": true},
+  {"name": "v", "source": "v", "type": "Real", "desc": "ball velocity (m/s)", "sync": true}
+]

@@ -1,5 +1,7 @@
-# FMU models & extracts
+# FMU models & extracts (keep redistributable demos under Script/examples/fmus/)
 *.fmu
+!Script/examples/fmus/
+!Script/examples/fmus/**
 __extracted_*.fmu__/
 
 # Build / packaging

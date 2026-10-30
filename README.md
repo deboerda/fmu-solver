@@ -43,6 +43,19 @@ python FmuLauncherUniversal.py
 3. Start / pause / stop from the GUI; in source mode the launcher spawns `fmu_player.py` (64-bit = same Python; 32-bit needs `C:\Py32\python.exe`).  
 4. To build one-file exes: `Script\rebuild_all.bat` (see [`docs/FROM_SOURCE.md`](docs/FROM_SOURCE.md)).
 
+## Clone-and-demo
+
+Sample FMU (≈213 KiB): [`Script/examples/fmus/BouncingBall.fmu`](Script/examples/fmus/BouncingBall.fmu) — [Reference-FMUs](https://github.com/modelica/Reference-FMUs) v0.0.42, FMI 2.0, **BSD-2-Clause** ([NOTICE](Script/examples/fmus/NOTICE.md)).
+
+```powershell
+cd Script
+python -m pip install -r ..\requirements.txt
+.\demo_bouncing_ball.bat
+```
+
+GUI: `run_fmusolver_dev.bat` → open that `.fmu` → stop ≈ 3 s.  
+Prebuilt win64 GUI/worker: GitHub Actions workflow `Windows build` (artifact / Release on tags `v*`) — see [`docs/FROM_SOURCE.md`](docs/FROM_SOURCE.md).
+
 **Not a Linux GUI app** — Windows APIs in the launcher. FMPy worker code may import elsewhere, but Win32/Win64 FMU binaries need Windows.
 
 More: [`docs/FROM_SOURCE.md`](docs/FROM_SOURCE.md) · [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`Script/README_Scripts.md`](Script/README_Scripts.md)

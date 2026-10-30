@@ -1,0 +1,111 @@
+# DRAFT / INSTALL
+# GitHub OAuth used by automation lacked the `workflow` scope, so this file
+# lives under docs/ci/ until copied into place:
+#   mkdir -p .github/workflows
+#   cp docs/ci/windows-build.yml .github/workflows/windows-build.yml
+#   git add .github/workflows/windows-build.yml && git commit && git push
+# Then: Actions → "Windows build" → Run workflow (or push tag v*).
+#
+# Build FMUSolver GUI + 64-bit worker on windows-latest (no customer/vendor DLLs).
+# Artifacts attach to the workflow run; tags v* also create a GitHub Release.
+name: Windows build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+    branches:
+      - main
+    paths:
+      - "Script/**"
+      - "requirements.txt"
+      - ".github/workflows/windows-build.yml"
+  pull_request:
+    paths:
+      - "Script/**"
+      - "requirements.txt"
+      - ".github/workflows/windows-build.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build-win64:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12 (64-bit)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          architecture: x64
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Ensure packaging icon
+        shell: pwsh
+        working-directory: Script
+        run: |
+          if (-not (Test-Path fmusolver_full.ico) -and (Test-Path fmusolver.ico)) {
+            Copy-Item fmusolver.ico fmusolver_full.ico
+          }
+
+      - name: PyInstaller FmuSolver (GUI) + FmuWorker64
+        shell: pwsh
+        working-directory: Script
+        run: |
+          python -m PyInstaller --noconfirm FmuSolver.spec
+          python -m PyInstaller --noconfirm --onefile --console --name FmuWorker64 --workpath ./build --distpath ./dist fmu_player.py
+
+      - name: Stage dist_package
+        shell: pwsh
+        working-directory: Script
+        run: |
+          $out = "dist_package"
+          New-Item -ItemType Directory -Force -Path $out | Out-Null
+          New-Item -ItemType Directory -Force -Path "$out\examples\fmus" | Out-Null
+          Copy-Item dist\FmuSolver.exe $out\
+          Copy-Item dist\FmuWorker64.exe $out\
+          if (Test-Path sync_fields.json) { Copy-Item sync_fields.json $out\ }
+          Copy-Item examples\sync_fields.BouncingBall.json $out\
+          Copy-Item examples\fmus\BouncingBall.fmu "$out\examples\fmus\"
+          Copy-Item examples\fmus\NOTICE.md "$out\examples\fmus\"
+          Copy-Item examples\fmus\LICENSE-Reference-FMUs-BSD-2-Clause.txt "$out\examples\fmus\"
+          if (Test-Path fmusolver_full.ico) { Copy-Item fmusolver_full.ico $out\ }
+          @"
+          FMUSolver win64 build (source tools only — no customer DLLs)
+          1. Run FmuSolver.exe
+          2. Browse to examples\fmus\BouncingBall.fmu
+          3. Stop time ~3 s, step ~0.01, Start
+          Or: FmuWorker64.exe examples\fmus\BouncingBall.fmu --step 0.01 --rate 0 --freq 10 --time 3
+          "@ | Set-Content -Encoding utf8 "$out\README-DEMO.txt"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FMUSolver-win64
+          path: Script/dist_package/
+          if-no-files-found: error
+
+      - name: Create GitHub Release (tags only)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            Script/dist_package/FmuSolver.exe
+            Script/dist_package/FmuWorker64.exe
+          body: |
+            Prebuilt **win64** GUI + worker from CI (no customer/vendor solver DLLs).
+            Demo FMU is in the repo at `Script/examples/fmus/BouncingBall.fmu` (Reference-FMUs, BSD-2-Clause).
+            Place `FmuWorker64.exe` next to `FmuSolver.exe`, then open the sample FMU in the GUI.
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

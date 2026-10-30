@@ -79,3 +79,47 @@ python -c "import sys; sys.path.insert(0,'Script'); import ddm_pb2, fmu_player"
 ```
 
 Do not expect a headless Linux GUI smoke test.
+
+
+## Clone-and-demo (sample FMU)
+
+Bundled sample: [`Script/examples/fmus/BouncingBall.fmu`](../Script/examples/fmus/BouncingBall.fmu)
+from [modelica/Reference-FMUs](https://github.com/modelica/Reference-FMUs) **v0.0.42** (FMI 2.0, **BSD-2-Clause**).
+See [`NOTICE.md`](../Script/examples/fmus/NOTICE.md).
+
+### Windows CLI smoke (no GUI)
+
+```powershell
+cd Script
+python -m pip install -r ..\requirements.txt
+.\demo_bouncing_ball.bat
+```
+
+### Windows GUI
+
+```powershell
+cd Script
+copy examples\sync_fields.BouncingBall.json sync_fields.json
+.\run_fmusolver_dev.bat
+```
+
+Browse to `examples\fmus\BouncingBall.fmu`, stop ≈ 3 s, step ≈ 0.01, Start.
+
+### Prebuilt workers (GitHub Actions)
+
+Workflow draft: [`docs/ci/windows-build.yml`](ci/windows-build.yml) — builds `FmuSolver.exe` + `FmuWorker64.exe` on `windows-latest` (**no customer/vendor DLLs**).
+
+Enable once (needs a GitHub token/app with the **`workflow`** scope, or paste via the GitHub UI):
+
+```powershell
+mkdir -p .github/workflows
+cp docs/ci/windows-build.yml .github/workflows/windows-build.yml
+git add .github/workflows/windows-build.yml
+git commit -m "ci: enable Windows PyInstaller workflow"
+git push
+```
+
+Then: **Actions → Windows build → Run workflow**, or push a tag `v*`. Download artifact **FMUSolver-win64** (or Release assets on tags). Put `FmuWorker64.exe` next to `FmuSolver.exe`.
+
+Local alternative: `Scriptebuild_all.bat`.
+
